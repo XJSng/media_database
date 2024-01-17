@@ -2,13 +2,13 @@ const {MongoClient} = require('mongodb')
 require('dotenv').config()
 
 async function connectToMongoDB() {
-    const url = process.env.MONGODB_URL
-    const client = new MongoClient(url)
+    const uri = process.env.MONGODB_URI
+    const client = new MongoClient(uri)
 
     try {
         await client.connect();
         console.log('Connected to MongoDB');
-        return client.db();
+        return client.db('fmc_media_database');
       } catch (error) {
         console.error('Error connecting to MongoDB', error);
         throw error;    
@@ -16,4 +16,4 @@ async function connectToMongoDB() {
 }
 
 
-module.exports= {connectToMongoDB}
+module.exports = {connectToMongoDB}
