@@ -1,8 +1,12 @@
 const express = require("express")
+const router = express.Router()
+const jwt = require("jsonwebtoken")
+const bcrypt = require('bcrypt')
 const cors = require("cors")
 
 const { connectToMongoDB } = require(`./db`)
 const { ObjectId } = require('mongodb')
+const req = require("express/lib/request")
 
 const app = express()
 const port = 3000
@@ -185,5 +189,6 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
    }
 
 }
+
 // execute main
 main()
