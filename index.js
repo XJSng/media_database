@@ -6,7 +6,6 @@ const cors = require("cors")
 
 const { connectToMongoDB } = require(`./db`)
 const { ObjectId } = require('mongodb')
-const req = require("express/lib/request")
 
 const app = express()
 const port = 3000
@@ -24,6 +23,7 @@ async function main() {
       })
 
       // CREATING THE PORT ROUTE
+      // CREATE EQUIPMENT
       app.post('/equipment', async (req, res) => {
          try {
             const { name, dateOfPurchase, equipmentType, modelNumber, generalRemarks, service } = req.body
@@ -60,7 +60,7 @@ async function main() {
          }
       })
 
-      //GET EQUIPMENT BY ID
+      // GET ONE EQUIPMENT BY ID
       app.get('/equipment/:id', async (req, res) => {
          try {
             const id = new ObjectId(req.params.id)
@@ -100,7 +100,7 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
          }
       })
 
-      //get all livestream services
+      // GET ALL LIVESTREAM SERVICES
       app.get('/livestream', async (req, res) => {
          try {
             // Fetch all livestream services
@@ -141,17 +141,17 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
 
             }
 
-             // Replace equipment IDs with equipment names in 
+             // REPLACE EQUIPMENT ID WITH EQUIPMENT NAME
              for (let j = 0; j < livestreams.length; j++) {
                const livestream = livestreams[j]
 
-               if (Array.isArray(livestream.equipment_list)) {
-                  for (let k = 0; k < livestream.equipment_list.length; k++) {
-                     const equipmentId = livestream.equipment_list[k]
+               if (Array.isArray(livestream.equipmentList)) {
+                  for (let k = 0; k < livestream.equipmentList.length; k++) {
+                     const equipmentId = livestream.equipmentList[k]
 
 
                      if (equipmentMap[equipmentId]) {
-                        livestream.equipment_list[k] = equipmentMap[equipmentId]
+                        livestream.equipmentList[k] = equipmentMap[equipmentId]
                      }
                   }
                }
@@ -164,7 +164,23 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
          }
       })
 
-      //get all volunteers
+      // CREATE LIVESTREAM SERVICES
+      app.post("/livestream", async (req, res) => {
+         try {
+            const { livestreamDate, director, volunteers, equipmentList } = req.body
+            // Validation
+            if (!livestreamDate || !director || !volunteers || !equipmentList ) { return res.status(400).json({ message: "Missing required fields" }) }
+
+            const newLivestream = { livestreamDate, director, volunteers, equipmentList }
+            const result = await db.collection('livestream_service').insertOne(newLivestream)
+            res.status(201).json(result)
+
+         } catch (error) {
+            res.status(500).json({ message: "Error adding new livestream service", error: error.message })
+         }
+      })
+
+      // GET ALL VOLUNTEERS
       app.get('/volunteers', async (req, res) => {
          try {
             const user = await db.collection('volunteers').find({}).toArray()
@@ -174,7 +190,6 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
          }
       })
 
-      //update one equipment
 
 
 
