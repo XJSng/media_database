@@ -1,17 +1,16 @@
 const express = require("express")
-const router = express.Router()
-const jwt = require("jsonwebtoken")
-const bcrypt = require('bcrypt')
+const userRoutes = require("./users")
 const cors = require("cors")
 
-const { connectToMongoDB } = require(`./db`)
+
+const { connectToMongoDB } = require(`./mongoUtil`)
 const { ObjectId } = require('mongodb')
 
 const app = express()
 const port = 3000
 
 app.use(cors()) // using cors
-app.use(express.json());
+app.use(express.json()); // use json
 
 async function main() {
    try {
@@ -190,20 +189,23 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
          }
       })
 
+  // Resgister the API routes inside index.js
+  app.use("/users", require("./users"))
 
-
-
-      // PORT RUNNING HERE
-      app.listen(port, () => {
-         console.log(`Server is running on port ${port}`)
-      })
-
+    
 
    } catch (error) {
       console.error('Error connecting to MongoDB', error)
    }
 
+ 
+
 }
 
 // execute main
 main()
+
+  // PORT RUNNING HERE
+  app.listen(port, () => {
+   console.log(`Server is running on port ${port}`)
+})

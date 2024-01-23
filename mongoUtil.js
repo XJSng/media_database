@@ -1,4 +1,7 @@
+// mongoUtil: this file contains Mongo related utility functions
+
 const {MongoClient} = require('mongodb')
+let _db = null
 require('dotenv').config()
 
 async function connectToMongoDB() {
@@ -8,12 +11,19 @@ async function connectToMongoDB() {
     try {
         await client.connect();
         console.log('Connected to MongoDB');
-        return client.db('fmc_media_database');
+        const db = client.db('fmc_media_database');
+        _db = db
+        return db
       } catch (error) {
         console.error('Error connecting to MongoDB', error);
         throw error;    
       }
 }
 
+function getDB() {
+  return _db
+}
 
-module.exports = {connectToMongoDB}
+
+
+module.exports = {connectToMongoDB, getDB}
