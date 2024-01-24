@@ -3,9 +3,9 @@ const express = require("express")
 const userRoutes = require("./users")
 const cors = require("cors")
 
-
 const { connectToMongoDB } = require(`./mongoUtil`)
 const { ObjectId } = require('mongodb')
+const {authenticateToken} = require("./middlewares")
 
 const app = express()
 const port = 3000
@@ -24,7 +24,7 @@ async function main() {
 
       // CREATING THE PORT ROUTE
       // CREATE EQUIPMENT
-      app.post('/equipment', async (req, res) => {
+      app.post('/equipment' , async (req, res) => {
          try {
             const { name, dateOfPurchase, equipmentType, modelNumber, generalRemarks, service } = req.body
             // Validation
@@ -40,21 +40,12 @@ async function main() {
       })
 
       // GET ALL EQUIPMENT
-      app.get('/equipment', async (req, res) => {
+      app.get('/equipment', authenticateToken,  async (req, res) => {
          try {
+            
             const equipments = await db.collection('equipment_list').find({}).toArray()
-
-            // fetch services
-            const services = await db.collection('volunteers').find({}).toArray()
-            const serviceMap = {};
-
-            //Create service map using for loop
-            // for (const i = 0; i < services.length; i++) {
-            //    const service = services[i]
-            //    serviceMap[service._id] = service.name;
-            // }
-
-            res.json(equipments)
+            // fetch Equipments
+           res.json(equipments)
          } catch (error) {
             res.status(500).json({ message: 'Error fetching equipment list', error: error.message })
          }
@@ -97,6 +88,21 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
 
          } catch(error){
             res.status(500).json({ message: "Error updating Equipment", error: error.message})
+         }
+      })
+
+      // DELETE AN EQUIPMENT BY ID
+      app.delete("/equipment/:id", async(req, res)=>{
+ try {         
+    await db.collection("equipment_list").deleteOne({
+            '_id': new ObjectId(req.params.id)
+         })
+      res.json({
+         "message": "Equipment successfully deleted"
+      })
+      } 
+         catch (error) {
+
          }
       })
 

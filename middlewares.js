@@ -2,8 +2,10 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 function authenticateToken(req, res, next) {
+    try {
     const authHeader = req.headers.authorization;
     if (authHeader) {
+        // console.log(authHeader)
         // BEARER <token>
         const token = authHeader.split(' ')[1];
         if (token) {
@@ -16,7 +18,7 @@ function authenticateToken(req, res, next) {
                     })
                 } else {
                     req.data = data;
-                    next();
+                    return next();
                 }
             })
         } else {
@@ -24,7 +26,17 @@ function authenticateToken(req, res, next) {
             return res.json({
                 'error': 'Token not found'
             })
+        }}
+        else{
+            res.status(400);
+            return res.json({
+                'error': 'Authenticate not found'
+            })
         }
+        
+    } catch (error) {
+        res.status(500)
+        return res.json({ error: error.message })
     }
 }
 module.exports = {
