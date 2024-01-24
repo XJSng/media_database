@@ -1,4 +1,5 @@
 const express = require("express")
+// Refers to the router object
 const userRoutes = require("./users")
 const cors = require("cors")
 
@@ -189,8 +190,8 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
          }
       })
 
-  // Resgister the API routes inside index.js
-  app.use("/users", require("./users"))
+  // Resgister the user route
+  app.use("/users", userRoutes)
 
     
 

@@ -1,8 +1,8 @@
 const express = require('express');
-const {getDB} = require('./mongoUtil')
+const { getDB } = require('./mongoUtil')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const {ObjectId} = require("mongodb");
+const { ObjectId } = require("mongodb");
 const {authenticateToken} = require ("./middlewares")
 require('dotenv').config();
 
@@ -10,9 +10,9 @@ const router = express.Router();
 
 // custom middleware for authenticating via token
 
-// route here
-
+// Routes here
 router.post('/', async function(req,res){
+    try{
     const db = getDB();
     const result = await db.collection('users').insertOne({
         'email': req.body.email,
@@ -22,10 +22,17 @@ router.post('/', async function(req,res){
         'message':"Success",
         "result": result
     })
+} catch (error) {
+    res.status(428)
+    res.json({ "error": "Please enter username and password"
+    })
+}
+
 })
 
 router.post('/login', async function(req, res){
-    const db = getDB()
+    try {
+        const db = getDB()
     const user = await db.collection("users").findOne({
         'email': req.body.email
     })
@@ -34,7 +41,7 @@ router.post('/login', async function(req, res){
         const token = jwt.sign({
             "_id": user._id
         }, process.env.JWT_SECRET, {
-            "expiresIn": "1h"
+            "expiresIn": "5h"
         })
         res.json ({
             "token":token
@@ -45,12 +52,18 @@ router.post('/login', async function(req, res){
             'error': "Invalid credentials"
         })
     }
+} catch (error) {
+    res.status(500)
+    res.json({
+        "error": error
+    })
+}
 
 
 
 })
 
-// secure route 
+// secure route SELECT authorization "BEARER TOKEN"  
 router.get("/profile", authenticateToken, async function(req, res){
   console.log(req.data)
     // Changes need to be made
@@ -68,4 +81,4 @@ res.json({
 })
 })
 
-module.exports = router
+module.exports = router;
