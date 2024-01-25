@@ -27,19 +27,25 @@ To register a user pass the email and password to the `/user` route
  ![login image](/images/login.png)
  ![authorisation image](/images/authorisation.png)
 
-## Error Responses
+Error Responses
 
 The API returns JSON-formatted error responses with appropriate HTTP status codes. Error codes include:
-
 - **400 Bad Request:** The request was malformed or missing required fields.
 - **401 Unauthorized:** Authentication failed or not provided for a protected endpoint.
 - **404 Not Found:** The requested resource was not found.
 - **500 Internal Server Error:** An unexpected server error occurred.
 
-## Equipment Endpoints
+## Demo Equipment Endpoints `/equipment`
 
-### 1. Create Equipment
+### 1. GET Equipment
+- **Endpoint:** `GET /equipment`
+- **Authentication Required:** No
+- **Request Body:** No
 
+- **GET Example**
+ ![GET equipment example ](/images/get_equipment_example.png)
+
+### 2. POST Equipment
 - **Endpoint:** `POST /equipment`
 - **Authentication Required:** Yes
 - **Request Body:**
@@ -50,6 +56,53 @@ The API returns JSON-formatted error responses with appropriate HTTP status code
     "equipmentType": "Type",
     "modelNumber": "Model Number",
     "generalRemarks": "Remarks",
-    "service": "Service"
+    "service": {
+        "service-status": "not-serviced",
+        "last-service-date": "YYYY-MM-DD",
+        "service-remarks": "Remarks"
+    }
   }
   ```
+
+- **POST Example**
+![POST equipment example](/images/post_equipment_example.png)
+
+
+### 3. PUT Equipment
+- **Endpoint:** `PUT /equipment/equipmentId`
+- **Authentication Required:** Yes
+- **Request Body:**
+
+Using the `GET /equipment`, you would be able to get the equipment id you wouldl ike to update. From there extend the url rotue with `equipment/equipmentId`
+
+  ```json
+{
+  "name": "Updated equipment Name",
+  "dateOfPurchase": "YYYY-MM-DD",
+  "equipmentType": "Updated type",
+  "modelNumber": "Updated model number",
+  "generalRemarks": "Updated remarks",
+  "service": {
+      "service-status": "serviced",
+      "last-service-date": "YYYY-MM-DD",
+      "service-remarks": "Updated remarks"
+  }
+}
+  ```
+
+- **PUT Example**
+![PUT equipment example](/images/put_equipment_example.png)
+
+### 4. DELETE Equipment
+- **Endpoint:** `DELETE /equipment/equipmentId`
+- **Authentication Required:** Yes
+- **Request Body:**
+
+Using the `GET /equipment`, you would be able to get the equipment id you wouldl ike to update. From there extend the url rotue with `equipment/equipmentId`
+
+
+- **DELETE Example**
+![DELETE equipment example](/images/delete_equipment_example.png)
+
+
+## For the rest of the 
