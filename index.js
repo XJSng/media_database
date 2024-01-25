@@ -233,7 +233,6 @@ async function main() {
          }
       })
 
-
       // GET ALL VOLUNTEERS
       app.get('/volunteers', async (req, res) => {
          try {
@@ -241,6 +240,67 @@ async function main() {
             res.json(user)
          } catch (error) {
             res.status(500).json({ message: 'Error fetching volunteer list', error: error.message })
+         }
+      })
+
+      // CREATE A VOLUNTEER
+      app.post("/volunteers", async (req, res) => {
+         try {
+            const { name, dob, email, phoneNumber } = req.body
+            // Validation
+            if (!name || !dob || !email || !phoneNumber) { return res.status(400).json({ message: "Missing required fields" }) }
+
+            const newVolunteer = { name, dob, email, phoneNumber }
+            const result = await db.collection('volunteers').insertOne(newVolunteer)
+            res.status(201).json(result)
+
+         } catch (error) {
+            res.status(500).json({ message: "Error adding new volunteer", error: error.message })
+         }
+      })
+
+      // PUT VOLUNTEER BY ID
+      app.put("/volunteers/:id", async (req, res) => {
+         try {
+            const id = new ObjectId(req.params.id);
+            const { name, dob, email, phoneNumber } = req.body
+
+            // Validation
+            if (!name || !dob || !email || !phoneNumber) {
+               return res.status(400).json({ message: "Missing required fields" })
+            }
+
+            const updateData = { name, dob, email, phoneNumber };
+            const result = await db.collection('volunteers').updateOne(
+               { _id: id },
+               { $set: updateData }
+            )
+            if (result.modifiedCount === 0) {
+               return res.status(404).json({ message: "No volunteer found with this ID, or no new data provided" })
+            }
+            res.json({ message: "Volunteer updated successfully" })
+
+         } catch (error) {
+            res.status(500).json({ message: "Error updating volunteer", error: error.message })
+         }
+      })
+
+      // DELETE VOLUNTEER BY ID
+      app.delete("/volunteers/:id", async (req, res) => {
+         try {
+            const id = req.params.id
+            if (!ObjectId.isValid(id)) {
+               return res.status(400).json({ message: "Invalid volunteer ID" });
+            }
+            await db.collection("volunteers").deleteOne({
+               '_id': new ObjectId(id)
+            })
+            res.json({
+               "message": "Volunteer successfully deleted"
+            })
+         }
+         catch (error) {
+            res.status(500).json({ message: "Error deleting volunteer", error: error.message })
          }
       })
 
