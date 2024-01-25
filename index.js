@@ -40,7 +40,7 @@ async function main() {
       })
 
       // GET ALL EQUIPMENT AUTHENTICATION REQUIRED
-      app.get('/equipment', authenticateToken, async (req, res) => {
+      app.get('/equipment', async (req, res) => {
          try {
             const equipments = await db.collection('equipment_list').find({}).toArray()
             // fetch Equipments
@@ -66,7 +66,7 @@ async function main() {
       })
 
       // PUT EQUIPMENT BY ID
-      app.put("/equipment/:id", async (req, res) => {
+      app.put("/equipment/:id", authenticateToken, async (req, res) => {
          try {
             const id = new ObjectId(req.params.id);
             const { name, dateOfPurchase, equipmentType, modelNumber, generalRemarks, service } = req.body
@@ -92,10 +92,14 @@ async function main() {
       })
 
       // DELETE AN EQUIPMENT BY ID
-      app.delete("/equipment/:id", async (req, res) => {
+      app.delete("/equipment/:id", authenticateToken, async (req, res) => {
          try {
+            const id = req.params.id
+            if (!ObjectId.isValid(id)) {
+               return res.status(400).json({ message: "Invalid equipment ID" });
+            }
             await db.collection("equipment_list").deleteOne({
-               '_id': new ObjectId(req.params.id)
+               '_id': new ObjectId(id)
             })
             res.json({
                "message": "Equipment successfully deleted"
@@ -171,7 +175,7 @@ async function main() {
       })
 
       // CREATE LIVESTREAM SERVICES
-      app.post("/livestream", async (req, res) => {
+      app.post("/livestream", authenticateToken, async (req, res) => {
          try {
             const { livestreamDate, director, volunteers, equipmentList } = req.body
             // Validation
@@ -189,7 +193,7 @@ async function main() {
       })
 
       // PUT LIVESTREAM BY ID
-      app.put("/livestream/:id", async (req, res) => {
+      app.put("/livestream/:id", authenticateToken, async (req, res) => {
          try {
             const id = new ObjectId(req.params.id);
             const { livestreamDate, director, equipmentList, volunteers } = req.body
@@ -219,10 +223,14 @@ async function main() {
       })
 
       // DELETE LIVESTREAM BY ID
-      app.delete("/livestream/:id", async (req, res) => {
+      app.delete("/livestream/:id", authenticateToken, async (req, res) => {
          try {
+            const id = req.params.id
+            if (!ObjectId.isValid(id)) {
+               return res.status(400).json({ message: "Invalid livestream service ID" });
+            }
             await db.collection("livestream_service").deleteOne({
-               '_id': new ObjectId(req.params.id)
+               '_id': new ObjectId(id)
             })
             res.json({
                "message": "Livestream service successfully deleted"
@@ -234,7 +242,7 @@ async function main() {
       })
 
       // GET ALL VOLUNTEERS
-      app.get('/volunteers', async (req, res) => {
+      app.get('/volunteer', async (req, res) => {
          try {
             const user = await db.collection('volunteers').find({}).toArray()
             res.json(user)
@@ -244,7 +252,7 @@ async function main() {
       })
 
       // CREATE A VOLUNTEER
-      app.post("/volunteers", async (req, res) => {
+      app.post("/volunteer", authenticateToken, async (req, res) => {
          try {
             const { name, dob, email, phoneNumber } = req.body
             // Validation
@@ -260,7 +268,7 @@ async function main() {
       })
 
       // PUT VOLUNTEER BY ID
-      app.put("/volunteers/:id", async (req, res) => {
+      app.put("/volunteer/:id", authenticateToken, async (req, res) => {
          try {
             const id = new ObjectId(req.params.id);
             const { name, dob, email, phoneNumber } = req.body
@@ -286,7 +294,7 @@ async function main() {
       })
 
       // DELETE VOLUNTEER BY ID
-      app.delete("/volunteers/:id", async (req, res) => {
+      app.delete("/volunteer/:id", authenticateToken, async (req, res) => {
          try {
             const id = req.params.id
             if (!ObjectId.isValid(id)) {
