@@ -5,7 +5,7 @@ const cors = require("cors")
 
 const { connectToMongoDB } = require(`./mongoUtil`)
 const { ObjectId } = require('mongodb')
-const {authenticateToken} = require("./middlewares")
+const { authenticateToken } = require("./middlewares")
 
 const app = express()
 const port = 3000
@@ -24,7 +24,7 @@ async function main() {
 
       // CREATING THE PORT ROUTE
       // CREATE EQUIPMENT
-      app.post('/equipment' , async (req, res) => {
+      app.post('/equipment', async (req, res) => {
          try {
             const { name, dateOfPurchase, equipmentType, modelNumber, generalRemarks, service } = req.body
             // Validation
@@ -39,13 +39,12 @@ async function main() {
          }
       })
 
-      // GET ALL EQUIPMENT
-      app.get('/equipment', authenticateToken,  async (req, res) => {
+      // GET ALL EQUIPMENT AUTHENTICATION REQUIRED
+      app.get('/equipment', authenticateToken, async (req, res) => {
          try {
-            
             const equipments = await db.collection('equipment_list').find({}).toArray()
             // fetch Equipments
-           res.json(equipments)
+            res.json(equipments)
          } catch (error) {
             res.status(500).json({ message: 'Error fetching equipment list', error: error.message })
          }
@@ -67,42 +66,43 @@ async function main() {
       })
 
       // PUT EQUIPMENT BY ID
-      app.put("/equipment/:id", async (req, res)=>{
+      app.put("/equipment/:id", async (req, res) => {
          try {
             const id = new ObjectId(req.params.id);
             const { name, dateOfPurchase, equipmentType, modelNumber, generalRemarks, service } = req.body
 
             // Validation
-            if (!name || !dateOfPurchase || !equipmentType || !modelNumber || !generalRemarks || !service) { 
-               return res.status(400).json({ message: "Missing required fields" }) }
+            if (!name || !dateOfPurchase || !equipmentType || !modelNumber || !generalRemarks || !service) {
+               return res.status(400).json({ message: "Missing required fields" })
+            }
 
-const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRemarks, service };
-               const result = await db.collection('equipment_list').updateOne(
-                  {_id: id},
-                  {$set:updateData}
-               )
-               if (result.modifiedCount === 0) {
-                  return res.status(404).json({ message: "No equipment found with this ID, or no new data provided"})
-               }
-               res.json({message: "Equipment updated successfully"})
+            const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRemarks, service };
+            const result = await db.collection('equipment_list').updateOne(
+               { _id: id },
+               { $set: updateData }
+            )
+            if (result.modifiedCount === 0) {
+               return res.status(404).json({ message: "No equipment found with this ID, or no new data provided" })
+            }
+            res.json({ message: "Equipment updated successfully" })
 
-         } catch(error){
-            res.status(500).json({ message: "Error updating Equipment", error: error.message})
+         } catch (error) {
+            res.status(500).json({ message: "Error updating Equipment", error: error.message })
          }
       })
 
       // DELETE AN EQUIPMENT BY ID
-      app.delete("/equipment/:id", async(req, res)=>{
- try {         
-    await db.collection("equipment_list").deleteOne({
-            '_id': new ObjectId(req.params.id)
-         })
-      res.json({
-         "message": "Equipment successfully deleted"
-      })
-      } 
+      app.delete("/equipment/:id", async (req, res) => {
+         try {
+            await db.collection("equipment_list").deleteOne({
+               '_id': new ObjectId(req.params.id)
+            })
+            res.json({
+               "message": "Equipment successfully deleted"
+            })
+         }
          catch (error) {
-
+            res.status(500).json({ message: "Error deleting equipment", error: error.message })
          }
       })
 
@@ -147,8 +147,8 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
 
             }
 
-             // REPLACE EQUIPMENT ID WITH EQUIPMENT NAME
-             for (let j = 0; j < livestreams.length; j++) {
+            // REPLACE EQUIPMENT ID WITH EQUIPMENT NAME
+            for (let j = 0; j < livestreams.length; j++) {
                const livestream = livestreams[j]
 
                if (Array.isArray(livestream.equipmentList)) {
@@ -175,8 +175,10 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
          try {
             const { livestreamDate, director, volunteers, equipmentList } = req.body
             // Validation
-            if (!livestreamDate || !director || !volunteers || !equipmentList ) { return res.status(400).json({ message: "Missing required fields" }) }
-
+            if (!livestreamDate || !director || !volunteers || !equipmentList) { return res.status(400).json({ message: "Missing required fields" }) }
+            if (!Array.isArray(equipmentList) || !Array.isArray(volunteers)) {
+               return res.status(400).json({ message: "equipments or volunteers must be an array" })
+            }
             const newLivestream = { livestreamDate, director, volunteers, equipmentList }
             const result = await db.collection('livestream_service').insertOne(newLivestream)
             res.status(201).json(result)
@@ -185,6 +187,52 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
             res.status(500).json({ message: "Error adding new livestream service", error: error.message })
          }
       })
+
+      // PUT LIVESTREAM BY ID
+      app.put("/livestream/:id", async (req, res) => {
+         try {
+            const id = new ObjectId(req.params.id);
+            const { livestreamDate, director, equipmentList, volunteers } = req.body
+
+            // Validation
+            if (!livestreamDate || !director || !equipmentList || !volunteers) {
+               return res.status(400).json({ message: "Missing required fields" })
+            }
+            if (!Array.isArray(equipmentList) || !Array.isArray(volunteers)) {
+               return res.status(400).json({ message: "equipments or volunteers must be an array" })
+            }
+
+            const updateData = { livestreamDate, director, equipmentList, volunteers };
+
+            const result = await db.collection('livestream_service').updateOne(
+               { _id: id },
+               { $set: updateData }
+            )
+            if (result.modifiedCount === 0) {
+               return res.status(404).json({ message: "No livestream found with this ID, or no new data provided" })
+            }
+            res.json({ message: "Equipment updated successfully" })
+
+         } catch (error) {
+            res.status(500).json({ message: "Error updating Equipment", error: error.message })
+         }
+      })
+
+      // DELETE LIVESTREAM BY ID
+      app.delete("/livestream/:id", async (req, res) => {
+         try {
+            await db.collection("livestream_service").deleteOne({
+               '_id': new ObjectId(req.params.id)
+            })
+            res.json({
+               "message": "Livestream service successfully deleted"
+            })
+         }
+         catch (error) {
+            res.status(500).json({ message: "Error deleting livestream service", error: error.message })
+         }
+      })
+
 
       // GET ALL VOLUNTEERS
       app.get('/volunteers', async (req, res) => {
@@ -196,23 +244,22 @@ const updateData = { name, dateOfPurchase, equipmentType, modelNumber, generalRe
          }
       })
 
-  // Resgister the user route
-  app.use("/users", userRoutes)
+      // Resgister the user route
+      app.use("/users", userRoutes)
 
-    
+
 
    } catch (error) {
       console.error('Error connecting to MongoDB', error)
    }
 
- 
 
 }
 
 // execute main
 main()
 
-  // PORT RUNNING HERE
-  app.listen(port, () => {
+// PORT RUNNING HERE
+app.listen(port, () => {
    console.log(`Server is running on port ${port}`)
 })
