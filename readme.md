@@ -105,4 +105,65 @@ Using the `GET /equipment`, you would be able to get the equipment id you wouldl
 ![DELETE equipment example](/images/delete_equipment_example.png)
 
 
-## For the rest of the 
+# For the other routes
+I'll walkthrough only the GET and POST method for the other two routes (`/volunteers` & `/livestream`). The PUT and DELETE methods are similar by using the `/GET` method to reference the ID.
+
+## Demo volunteers Endpoints `/volunteers`
+### 1. GET volunteer
+- **Endpoint:** `GET /volunteer`
+- **Authentication Required:** No
+- **Request Body:** No
+
+- **GET Example**
+ ![GET volunteer example ](/images/get_volunteer_example.png)
+
+ ### 2. POST volunteer
+- **Endpoint:** `POST /volunteer`
+- **Authentication Required:** Yes
+- **Request Body:**
+  ```json
+  {
+    "name":"Carrot Tan",
+  "dob": "2000/01/01",
+  "email":"carrottan@gmail.com",
+  "phoneNumber":"88776655"
+  }
+  ```
+
+- **POST Example**
+![POST equipment example](/images/post_volunteer_example.png)
+
+## Demo volunteers Endpoints `/livestream`
+### 1. GET livestream
+- **Endpoint:** `GET /livestream`
+- **Authentication Required:** No
+- **Request Body:** No
+
+- **GET Example**
+ ![GET livestream example ](/images/get_livestream_example.png)
+
+ ### 2. POST livestream
+- **Endpoint:** `POST /livestream`
+- **Authentication Required:** Yes
+- **Request Body:**
+  ```json
+  "director":"65a5fe0ae4af74088a93b8ac",
+  "volunteers":["75a63a022503b928b30ebe1c",
+                "75a63abc2503b928b30ebe1d",
+                "75a639d92503b928b30ebe1b",
+                "75a639862503b928b30ebe19",
+                "75a638fe2503b928b30ebe17",
+                "75a615fb6c16377ddd480efe"],
+  "livestreamDate":"2024/01/14",
+  "equipmentList":[
+                "75a60f1f6c16377dcd370ef8",
+                "75a610126c16377dcd370ef9",
+                "75a610956c16377dcd370efa",
+                "75a611086c16377dcd370efb"]
+
+  ```
+  - NOTE: The equipments and volunteers can be referenced from the `GET /equipment` and `GET /volunteer` respectively
+  - The IDs above are modified for data security
+
+- **POST Example**
+![POST equipment example](/images/post_livestream_example.png)
