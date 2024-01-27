@@ -24,7 +24,7 @@ async function main() {
 
       // CREATING THE PORT ROUTE
       // CREATE EQUIPMENT
-      app.post('/equipment', async (req, res) => {
+      app.post('/equipment', authenticateToken, async (req, res) => {
          try {
             const { name, dateOfPurchase, equipmentType, modelNumber, generalRemarks, service } = req.body
             // Validation
@@ -66,7 +66,7 @@ async function main() {
       })
 
       // PUT EQUIPMENT BY ID
-      app.put("/equipment/:id", authenticateToken, async (req, res) => {
+      app.put("/equipment/:id", async (req, res) => {
          try {
             const id = new ObjectId(req.params.id);
             const { name, dateOfPurchase, equipmentType, modelNumber, generalRemarks, service } = req.body
@@ -92,7 +92,7 @@ async function main() {
       })
 
       // DELETE AN EQUIPMENT BY ID
-      app.delete("/equipment/:id", authenticateToken, async (req, res) => {
+      app.delete("/equipment/:id", async (req, res) => {
          try {
             const id = req.params.id
             if (!ObjectId.isValid(id)) {

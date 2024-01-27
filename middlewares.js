@@ -5,7 +5,6 @@ function authenticateToken(req, res, next) {
     try {
     const authHeader = req.headers.authorization;
     if (authHeader) {
-        // console.log(authHeader)
         // BEARER <token>
         const token = authHeader.split(' ')[1];
         if (token) {
